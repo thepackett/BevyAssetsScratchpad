@@ -1,1 +1,83 @@
-# BevyAssetsScratchpad
+## What problem does this solve or what need does it fill?
+Currently bevy_asset is geared toward loading and processing assets.
+The current pipeline for loading assets looks like (Assuming a custom implementation for everything is needed):
+```mermaid
+graph TD
+subgraph AppSetup[App Setup]
+  direction LR
+  app -->|call| init_asset
+  app -->|call| init_asset_loader
+  app -->|call| register_asset_source
+  register_asset_source -->|id is| asset_source_id
+  register_asset_source -->|source is| asset_source_builder
+  register_asset_source -->|has requirement| register_asset_source_note_requirement
+  register_asset_source -->|has side effect| register_asset_source_note_side_effect
+  app["App"]
+  init_asset["app.init_asset::&lt;CustomAsset&gt;()"]
+  init_asset_loader["app.init_asset_loader::&lt;CustomAssetLoader&gt;()"]
+  register_asset_source["app.register_asset_source(id, source)"]
+  register_asset_source_note_requirement["Must be called before adding the AssetPlugin"]
+  register_asset_source_note_side_effect["If an asset source already exists with the given Id, it is replaced."]
+  subgraph AssetSourceId
+    asset_source_id -->|with variant| asset_source_id_default
+    asset_source_id -->|with variant| asset_source_id_name
+    asset_source_id_default -->|a| asset_source_id_default_explanation
+    asset_source_id_name -->|a| asset_source_id_name_explanation
+    asset_source_id["Enum"]
+    asset_source_id_default["AssetSourceId::Default"]
+    asset_source_id_name["AssetSourceId::Name"]
+    asset_source_id_default_explanation["When an AssetPath does not provide a source, this source is used.\nE.g. &quot;/path/to/asset.custom&quot;"]
+    asset_source_id_name_explanation["When an AssetPath does provide a source, this source is used.\nE.g. &quot;custom://path/to/asset.custom&quot;"]
+  end
+  subgraph AssetSourceBuilder
+    asset_source_builder_get -->|gets you| asset_source_builder
+    asset_source_builder -->|has method| asset_source_builder_with_reader
+    asset_source_builder -->|has method| asset_source_builder_with_writer
+    asset_source_builder -->|has method| asset_source_builder_with_watcher
+    asset_source_builder -->|has method| asset_source_builder_with_processed_reader
+    asset_source_builder -->|has method| asset_source_builder_with_processed_writer
+    asset_source_builder -->|has method| asset_source_builder_with_processed_watcher
+    asset_source_builder -->|has method| asset_source_builder_with_watcher_warning
+    asset_source_builder -->|has method| asset_source_builder_with_processed_watcher_warning
+    asset_source_builder -->|has method| asset_source_builder_platform_default
+
+    asset_source_builder["AssetSourceBuilder"]
+    asset_source_builder_get["AssetSource::build()"]
+    asset_source_builder_with_reader["with_reader(...)"]
+    asset_source_builder_with_writer["with_writer(...)"]
+    asset_source_builder_with_watcher["with_watcher(...)"]
+    asset_source_builder_with_processed_reader["with_processed_reader(...)"]
+    asset_source_builder_with_processed_writer["with_processed_writer(...)"]
+    asset_source_builder_with_processed_watcher["with_processed_watcher(...)"]
+    asset_source_builder_with_watcher_warning["with_watcher_warning(...)"]
+    asset_source_builder_with_processed_watcher_warning["with_processed_watcher_warning(...)"]
+    asset_source_builder_platform_default["platform_default(...)"]
+  end
+end
+subgraph TypeSetup[Type Setup]
+  direction LR
+  custom_asset_loader -->|impl| asset_loader
+  custom_asset -->|impl/derive| asset
+  custom_asset_reader -->|impl| asset_reader
+  custom_asset_loader["CustomAssetLoader"]
+  custom_asset_reader["CustomAssetReader"]
+  asset_loader["AssetLoader"]
+  asset_reader["AssetReader"]
+  custom_asset["CustomAsset"]
+  asset["Asset"]
+end
+AppSetup ~~~ TypeSetup
+```
+
+## What solution would you like?
+
+The solution you propose for the problem presented.
+
+## What alternative(s) have you considered?
+
+Other solutions to solve and/or work around the problem presented.
+
+## Additional context
+
+Any other information you would like to add such as related previous work,
+screenshots, benchmarks, etc.
