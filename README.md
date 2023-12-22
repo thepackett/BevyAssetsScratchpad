@@ -33,8 +33,8 @@ subgraph AppSetup[App Setup]
   subgraph AssetSourceId
     asset_source_id -->|with variant| asset_source_id_default
     asset_source_id -->|with variant| asset_source_id_name
-    asset_source_id_default -->|a| asset_source_id_default_explanation
-    asset_source_id_name -->|a| asset_source_id_name_explanation
+    asset_source_id_default --> asset_source_id_default_explanation
+    asset_source_id_name --> asset_source_id_name_explanation
     asset_source_id["Enum"]
     asset_source_id_default["AssetSourceId::Default"]
     asset_source_id_name["AssetSourceId::Name"]
@@ -80,6 +80,14 @@ subgraph TypeSetup[Type Setup]
 end
 AppSetup ~~~ TypeSetup
 ```
+Definitions:
+- Source: A source that bytes can be extracted from. E.g. filesystem, remote, embedded, etc.
+- Reader: Translates from Source to byte data.
+- Writer: Translates from byte data to Source.
+- Loader: Translates from bytes to asset.
+- Saver: Translates from asset to bytes.
+
+
 
 This system is increadibly flexible, but it is worth noting that saving is unnecessarily coupled to processing.
 
