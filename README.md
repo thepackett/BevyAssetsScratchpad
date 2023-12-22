@@ -17,6 +17,7 @@ subgraph AppSetup[App Setup]
   register_asset_processor -.->|extension is| asset_processor_extension
   register_asset_processor -.->|for P| processor_note
   set_default_asset_processor -.->|extension is| asset_processor_extension
+  set_default_asset_processor -.->|has side effect| set_default_asset_processor_side_effect
   set_default_asset_processor -.->|for P| processor_note
   app["App"]
   init_asset["app.init_asset::&lt;CustomAsset&gt;()"]
@@ -24,6 +25,7 @@ subgraph AppSetup[App Setup]
   register_asset_source["app.register_asset_source(id, source)"]
   register_asset_processor["app.register_asset_processor::&lt;P: Process&gt;(extension)"]
   set_default_asset_processor["app.set_default_asset_processor::&lt;P: Process&gt;(extension)"]
+  set_default_asset_processor_side_effect["Replaces any existing asset processor for this extension with the given asset processor."]
   register_asset_source_note_requirement["Must be called before adding the AssetPlugin"]
   register_asset_source_note_side_effect["If an asset source already exists with the given Id, it is replaced."]
   asset_processor_extension["A &str that represents a file extension.\nE.g. &quot;cstm&quot; would apply to files with the &quot;.cstm&quot; extension"]
