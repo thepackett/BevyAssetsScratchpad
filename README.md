@@ -8,16 +8,26 @@ subgraph AppSetup[App Setup]
   app -->|call| init_asset
   app -->|call| init_asset_loader
   app -->|call| register_asset_source
+  app -.->|call| register_asset_processor
+  app -.->|call| set_default_asset_processor
   register_asset_source -->|id is| asset_source_id
   register_asset_source -->|source is| asset_source_builder
   register_asset_source -->|has requirement| register_asset_source_note_requirement
   register_asset_source -->|has side effect| register_asset_source_note_side_effect
+  register_asset_processor -.->|extension is| asset_processor_extension
+  register_asset_processor -.->|for P| processor_note
+  set_default_asset_processor -.->|extension is| asset_processor_extension
+  set_default_asset_processor -.->|for P| processor_note
   app["App"]
   init_asset["app.init_asset::&lt;CustomAsset&gt;()"]
   init_asset_loader["app.init_asset_loader::&lt;CustomAssetLoader&gt;()"]
   register_asset_source["app.register_asset_source(id, source)"]
+  register_asset_processor["app.register_asset_processor::&lt;P: Process&gt;(extension)"]
+  set_default_asset_processor["app.set_default_asset_processor::&lt;P: Process&gt;(extension)"]
   register_asset_source_note_requirement["Must be called before adding the AssetPlugin"]
   register_asset_source_note_side_effect["If an asset source already exists with the given Id, it is replaced."]
+  asset_processor_extension["A &str that represents a file extension.\nE.g. &quot;cstm&quot; would apply to files with the &quot;.cstm&quot; extension"]
+  processor_note["Although you can implement Process on your own type,\nit is recommended to use LoadAndSave&lt;L: AssetLoader, S: AssetSaver&lt;Asset = L::Asset&gt;&gt;"]
   subgraph AssetSourceId
     asset_source_id -->|with variant| asset_source_id_default
     asset_source_id -->|with variant| asset_source_id_name
@@ -26,8 +36,8 @@ subgraph AppSetup[App Setup]
     asset_source_id["Enum"]
     asset_source_id_default["AssetSourceId::Default"]
     asset_source_id_name["AssetSourceId::Name"]
-    asset_source_id_default_explanation["When an AssetPath does not provide a source, this source is used.\nE.g. &quot;/path/to/asset.custom&quot;"]
-    asset_source_id_name_explanation["When an AssetPath does provide a source, this source is used.\nE.g. &quot;custom://path/to/asset.custom&quot;"]
+    asset_source_id_default_explanation["When an AssetPath does not provide a source, this source is used.\nE.g. &quot;/path/to/asset.cstm&quot;"]
+    asset_source_id_name_explanation["When an AssetPath does provide a source, this source is used.\nE.g. &quot;custom://path/to/asset.cstm&quot;"]
   end
   subgraph AssetSourceBuilder
     asset_source_builder_get -->|gets you| asset_source_builder
@@ -68,6 +78,8 @@ subgraph TypeSetup[Type Setup]
 end
 AppSetup ~~~ TypeSetup
 ```
+
+This system is increadibly flexible, but it is worth noting that saving is unnecessarily coupled to processing.
 
 ## What solution would you like?
 
