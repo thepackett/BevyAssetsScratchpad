@@ -69,16 +69,31 @@ end
 subgraph TypeSetup[Type Setup]
   direction LR
   custom_asset_loader -->|impl| asset_loader
+  custom_asset_saver -->|impl| asset_saver
   custom_asset -->|impl/derive| asset
   custom_asset_reader -->|impl| asset_reader
+  custom_asset_writer -->|impl| asset_writer
   custom_asset_loader["CustomAssetLoader"]
+  custom_asset_saver["CustomAssetSaver"]
   custom_asset_reader["CustomAssetReader"]
+  custom_asset_writer["CustomAssetWriter"]
   asset_loader["AssetLoader"]
+  asset_saver["AssetSaver"]
   asset_reader["AssetReader"]
+  asset_writer["AssetWriter"]
   custom_asset["CustomAsset"]
   asset["Asset"]
 end
+subgraph AssetServer[AssetServer]
+  direction LR
+  world -->|gets you| asset_server
+  query -->|gets you| asset_server
+  world["World: world.get_resource::&lt;AssetServer&gt();"]
+  query["Query: Res&lt;AssetServer&gt;"]
+  asset_server["AssetServer"]
+end
 AppSetup ~~~ TypeSetup
+AppSetup ~~~ AssetServer
 ```
 Definitions:
 - Source: A source that bytes can be extracted from. E.g. filesystem, remote, embedded, etc.
