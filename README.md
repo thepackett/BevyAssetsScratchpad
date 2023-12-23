@@ -107,7 +107,9 @@ Definitions:
 - Saver: Translates from asset to bytes.
 - AssetServer: Used to load assets.
 
-
+TODO:
+- Adding the asset plugin is a requirement.
+- Describe AssetProcessor behavior
 
 This system is increadibly flexible, but it is worth noting that saving is unnecessarily coupled to processing.
 
