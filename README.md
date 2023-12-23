@@ -88,12 +88,16 @@ subgraph AssetServer[AssetServer]
   direction LR
   world -->|gets you| asset_server
   query -->|gets you| asset_server
+  asset_server -->|has method| asset_server_load
   world["World: world.get_resource::&lt;AssetServer&gt();"]
   query["Query: Res&lt;AssetServer&gt;"]
   asset_server["AssetServer"]
+  asset_server_load["asset_server.load(&quot;an_asset.cstm&quot;)"]
 end
 AppSetup ~~~ TypeSetup
 AppSetup ~~~ AssetServer
+classDef Green stroke:#BDFFA4,stroke-width:4px;
+class app Green;
 ```
 Definitions:
 - Source: A source that bytes can be extracted from. E.g. filesystem, remote, embedded, etc.
@@ -101,6 +105,7 @@ Definitions:
 - Writer: Translates from byte data to Source.
 - Loader: Translates from bytes to asset.
 - Saver: Translates from asset to bytes.
+- AssetServer: Used to load assets.
 
 
 
@@ -108,11 +113,10 @@ This system is increadibly flexible, but it is worth noting that saving is unnec
 
 ## What solution would you like?
 
-The solution you propose for the problem presented.
+I would like to split processing and saving into two distinct parts. The current Saver will only be responsible for converting an asset into bytes, and a new Processor will be introduced which is responsible for actually operating on an asset.
+So for instance, LoadAndSave<L: Loader, S: Saver> processor would become LoadAndSave<L: Loader, P: Processor, S: Saver>. 
 
-## What alternative(s) have you considered?
-
-Other solutions to solve and/or work around the problem presented.
+With Savers decoupled from Processors, it would allow us to expose saving functions through the AssetServer that can utilize registered Savers. This API may look something like save::<A: Asset>(path: Path, asset: A). This is primarily useful for saving DynamicScenes, but could also be used for saving things like screenshots.
 
 ## Additional context
 
