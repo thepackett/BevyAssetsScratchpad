@@ -1,6 +1,18 @@
 ## What problem does this solve or what need does it fill?
 Currently bevy_asset is geared toward loading and processing assets.
 The current pipeline for loading assets looks like (Assuming a custom implementation for everything is needed):
+## Bevy_Asset Usage Graph
+Definitions:
+- AssetSource: A source that bytes can be extracted from. E.g. filesystem, remote, embedded, etc.
+- AssetReader: Translates from Source to byte data.
+- AssetWriter: Translates from byte data to Source.
+- AssetLoader: Translates from bytes to asset.
+- AssetSaver: Translates from asset to bytes, possibly also processing the asset.
+- AssetServer: Used to load assets.
+- AssetProcessor: A background processer that loads all assets from a "source" AssetSource, processes them, and then saves them to a "destination" AssetSource.
+  - Meta File: Produced when assets are processed and saved in the same location as the source asset they correspond to.
+
+Using bevy's asset system involves setting up your app (top subgraph starting with `App`), your types (lower left subgraph), and then using the asset server (lower right subgraph).
 ```mermaid
 graph TD
 subgraph AppSetup[App Setup]
@@ -99,17 +111,20 @@ AppSetup ~~~ AssetServer
 classDef Green stroke:#BDFFA4,stroke-width:4px;
 class app Green;
 ```
-Definitions:
-- Source: A source that bytes can be extracted from. E.g. filesystem, remote, embedded, etc.
-- Reader: Translates from Source to byte data.
-- Writer: Translates from byte data to Source.
-- Loader: Translates from bytes to asset.
-- Saver: Translates from asset to bytes.
-- AssetServer: Used to load assets.
+```mermaid
+graph TD
+asset_server["AssetServer"]
+asset_processor["AssetProcessor"]
+```
 
 TODO:
 - Adding the asset plugin is a requirement.
 - Describe AssetProcessor behavior
+
+Notes:
+What information needs to be conveyed?
+- How a user *uses* these systems, which should be visually distinct from
+- How these systems work internally, at least to a high level approximation
 
 This system is increadibly flexible, but it is worth noting that saving is unnecessarily coupled to processing.
 
