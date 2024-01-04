@@ -34,10 +34,10 @@ asset_saver["AssetSaver:\nTranslates an Asset to bytes, possibly processing it"]
 ### Asset Processing:
 ```mermaid
 graph TD
-asset_reader -->|something that impls| process_trait
-process_trait -->|gives processed bytes to| asset_writer
-asset_loader -->|gives loaded asset to| load_save_processor
-load_save_processor -->|processes and saves loaded asset with| asset_saver
+asset_reader -->|byte data| process_trait
+process_trait -->|processed byte data| asset_writer
+asset_loader -->|loaded asset| load_save_processor
+load_save_processor -->|processed asset| asset_saver
 asset_reader["AssetReader"]
 asset_writer["AssetWriter"]
 asset_loader["AssetLoader"]
