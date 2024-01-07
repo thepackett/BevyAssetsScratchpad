@@ -144,3 +144,30 @@ world -->|gets you| asset_server
   asset_server["AssetServer"]
   asset_server_load["asset_server.load(&quot;an_asset.cstm&quot;)"]
 ```
+
+## Bevy Asset Internals
+### AssetServer
+- 
+
+### AssetProcessor
+- contains an exclusive AssetServer which is configured for asset processing requirements
+  - Such as?
+- contains 'data' which represents the state of the AssetProcessor. This state includes data on
+  - what processors and default processors are added
+  - the current state of the AssetProcessor (Initializing, Processing, or Finished)
+  - asset sources
+  - Senders and recievers for initialization and finished "events" that are emitted when the AssetProcessor has its state changed.
+  - A log which tracks the state of asset processing to ensure that processing operations are atomic.
+- When the AssetProcessor is started, it immediately starts processing all configures assets. Once it is done it blocks on listening for source change events.
+  - Processing all files involves 
+  - When it recieves a source change event, it takes action based on the event recieved. I.e. if an asset added event is received, it processes that asset.
+
+### Meta files
+- Files that communicate to the AssetServer or AssetProcessor how an asset should be handled.
+- Contains:
+  - AssetMetaMinimal
+    - The bare minimum that a .meta file may contain.
+      - Lists meta information, such as meta format version and an:
+      - AssetActionMinimal, which is an enum with variants Load, Process, and Ignore. Each variant stores the required information for the action it represents.
+- Meta files are generated:
+  - When processing assets, if an asset does not have a meta file then one is generated from the default meta file for the default processor for an asset's file extension if it exits, otherwise from the loader for that file extension.
