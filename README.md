@@ -171,3 +171,43 @@ world -->|gets you| asset_server
       - AssetActionMinimal, which is an enum with variants Load, Process, and Ignore. Each variant stores the required information for the action it represents.
 - Meta files are generated:
   - When processing assets, if an asset does not have a meta file then one is generated from the default meta file for the default processor for an asset's file extension if it exits, otherwise from the loader for that file extension.
+
+### Asset "Lifetime"
+ - From the "to be processed' directory
+   - File is processed using the local meta file, or the default meta file for this laoder?processor? if local meta file does not exist
+   - File is saved to the "not to be processed" directory with a meta file telling bevy what loader it should use to load this file.
+PR:
+future possibilities?
+AssetTransformer chaining?: Any tuple of AssetTransformers with maching inputs an outputs should also be an AssetTransformer. Problem: How to generically combine Settings and Error types. Best guess
+```rust
+/// Blanket implementation of AssetTransformer for any tuple of AssetTransformers who have the
+impl<T: AssetTransformer<AssetOutput = U::AssetInput>, U: AssetTransformer> AssetTransformer for (T, U) {
+    type AssetInput = T::AssetInput;
+    type AssetOutput = U::AssetOutput;
+    type Settings = (T::Settings, U::Settings);
+    type Error = ?;
+
+    fn transform<'a>(
+        &'a self,
+        asset: Self::AssetInput,
+        settings: &'a Self::Settings,
+    ) -> Result<Self::AssetOutput, Box<dyn std::error::Error + Send + Sync + 'static>> {
+        Ok(U::transform(&self.1, T::transform( &self.0, asset, &settings.0)?, &settings.1)?)
+    }
+}
+```
+
+
+
+
+
+# Bevy Asset Wishlist:
+- Runtime loading options settable at load time (currently only settable via .meta file or when adding the loader to the app)
+- Runtime processing
+  - Set processor options at process time (currently only accessible via .meta file)
+- Runtime saving
+  - Set saver options at save time (currently only accessible via .meta file)
+- Savable/Loadable Handles
+  - One source of "truth" for assets location?
+    - Asset path for loaded assets.
+    - What about manually inserted assets?
