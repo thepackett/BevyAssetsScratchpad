@@ -6,7 +6,7 @@ GLTF stands for Graphics Library Transmission Format, and is an industry standar
 In addition to the core GLTF specification (which covers most things like textures, meshes, scenes, etc), GLTF also supports `Extensions`. 
 
 ### Extensions:
-An `Extension` is additional data that can be appended to any JSON object to provide additional functionality. For example, the `KHR_materials_ior` extension appends a single float to a material that represents its Index of Refraction. 
+An `Extension` is additional data that can be appended to any JSON object in a gltf file to provide additional functionality. For example, the `KHR_materials_ior` extension appends a single float to a material that represents its Index of Refraction. 
 
 `Extensions` were designed to be an interoperable way to extend GLTF functionality without affecting the core GLTF specification, with unsupported `extensions` simply being ignored. However, some `extensions` do need to affect the core GLTF specification in a non-interoperable way. For example, `EXT_meshopt_compression` which appends pointers to buffers containing compressed mesh data makes the original non-compressed mesh buffer pointer optional (it may be included for interoperability, but it somewhat defeats the purpose to include both compressed and uncompressed data).
 
