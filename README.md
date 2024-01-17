@@ -211,3 +211,9 @@ impl<T: AssetTransformer<AssetOutput = U::AssetInput>, U: AssetTransformer> Asse
   - One source of "truth" for assets location?
     - Asset path for loaded assets.
     - What about manually inserted assets?
+    - Asset uuids that point to additional data, such as path, manual construction, etc?
+      - Should this be flexible so that users can add new "sources" for assets outside of the asset server or manual construction?
+        - Should manual construction just be its own `AssetSource` from the asset server?
+          - This begs some questions about save dependencies. Is this supported?
+    - Currently `UntypedAssetId` uses asset uuids so that if an asset that fails to load later succeeds, all handles to it will be properly updated. We want to maintain this feature.
+- `AssetReader` and `AssetWriter` currently don't have custom error types and instead use a shared error type. Some asset sources will have unique errors, such as http errors for remote://, so `AssetReader`s and `AssetWriter`s should define their own error types.
