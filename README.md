@@ -217,3 +217,27 @@ impl<T: AssetTransformer<AssetOutput = U::AssetInput>, U: AssetTransformer> Asse
           - This begs some questions about save dependencies. Is this supported?
     - Currently `UntypedAssetId` uses asset uuids so that if an asset that fails to load later succeeds, all handles to it will be properly updated. We want to maintain this feature.
 - `AssetReader` and `AssetWriter` currently don't have custom error types and instead use a shared error type. Some asset sources will have unique errors, such as http errors for remote://, so `AssetReader`s and `AssetWriter`s should define their own error types.
+
+# Bevy Gltf Extension Requirements
+- The Extension system must be able to:
+  - Allow user defined extensions
+    - Allow alterations to other extensions? (maybe as a solution to the verification problem?)
+  - Allow user defined ways to extract stuff (Just Assets, or more than just that?) from the Gltf file.
+    - Allow alterations to other people's way to extract stuff? (what if your extension added additional behavior, ideally you want to be able to integrate that into existing stuff (such as extra components added to a bevy Scene))
+  - Be able to verify whether or not a given gltf is gltf compliant (both when loading and saving)
+  - Be able to load any gltf compliant file, so long as it doesn't require an unsupported extension.
+  - Be able to save a gltf compliant file with any extensions.
+  - Be able to create a gltf file to save in code from stuff.
+  - Ideally, and most pressingly, have a nice api for interacting with gltf extensions.
+ 
+- What is a Gltf extension?
+  - In regards to a Gltf file:
+    - A Gltf extension is any additional data that can be appended to *any* json object in the Gltf file
+    - In addition to appending additional data, Gltf extensions can make some part of the json objects they are attached to redundant, affecting verification if the extension is listed as required
+      - There is also a rarer behavior in which a Gltf extension changes the structure of the data of the core Gltf specification. To my knowledge, this only occures in the [Mesh Quantization](<https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_mesh_quantization/README.md>) extension. Whether or not this unique behavior should be supported is up for debate.
+  - In regards to the stuff the Gltf file represents:
+    - A Gltf extension may offer an alternative form of data for some stuff (ie compression).
+    - A Gltf extension may indicate additional properties or behavior for some stuff (ie emissiveness, an index or refraction, some game particular behavior indicator, etc).
+  - For a Gltf extensions to be "supported", it must be supported on the file side and on the "stuff" side.
+    - To give an example as to why this is necessary, the [KHR_materials_unlit](<https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_unlit/README.md>) extension is effectively a marker that a particular material should be affected by an alternative unlit shading model, usually for performance reasons. Stuff must be able to support these behaviors in order for the extension to be truly supported.
+      - Warn whenever stuff tries to extract something from the Gltf and doesn't use all extension data provided?
